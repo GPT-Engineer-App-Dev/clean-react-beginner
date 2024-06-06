@@ -73,7 +73,7 @@ export const useDeleteEvent = () => {
     });
 };
 
-
+// Hooks for Comments table
 export const useComments = () => useQuery({
     queryKey: ['comments'],
     queryFn: () => fromSupabase(supabase.from('comments').select('*')),
@@ -109,4 +109,51 @@ export const useDeleteComment = () => {
     });
 };
 
-export { useLogin, useLogout };
+// Authentication Context and Hooks
+const AuthContext = createContext();
+
+export const SupabaseAuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const session = supabase.auth.session();
+        setUser(session?.user ?? null);
+
+        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+            setUser(session?.user ?? null);
+            if (!session?.user) {
+                navigate('/login');
+            }
+        });
+
+        return () => {
+            authListener?.unsubscribe();
+        };
+    }, [navigate]);
+
+    return (
+        <AuthContext.Provider value={{ user, setUser }}>
+            {children}
+        </AuthContext.Provider>
+    );
+};
+
+export const useAuth = () => {
+    return useContext(AuthContext);
+};
+
+export const useLogin = () => {
+    return async (email, password) => {
+        const { error, user } = await supabase.auth.signIn({ email, password });
+        if (error) throw error;
+        return user;
+    };
+};
+
+export const useLogout = () => {
+    return async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+    };
+};
