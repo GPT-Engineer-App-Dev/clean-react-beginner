@@ -1,3 +1,4 @@
+import React from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect, createContext, useContext } from 'react';
