@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect, createContext, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_PROJECT_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
@@ -142,19 +143,15 @@ export const useAuth = () => {
     return useContext(AuthContext);
 };
 
-export const useLogin = () => {
-    return async (email, password) => {
-        const { error, user } = await supabase.auth.signIn({ email, password });
-        if (error) throw error;
-        return user;
-    };
+export const useLogin = async (email, password) => {
+    const { error, user } = await supabase.auth.signIn({ email, password });
+    if (error) throw error;
+    return user;
 };
 
-export const useLogout = () => {
-    return async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-    };
+export const useLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
 };
 
 export { useLogin, useLogout };
